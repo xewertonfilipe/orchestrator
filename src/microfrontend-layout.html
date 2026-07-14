@@ -1,0 +1,20 @@
+<single-spa-router>
+  <main>
+    <route default>
+      <application name="@bytebank/authentication"></application>
+    </route>
+    <route path="/home" exact>
+      <application name="@bytebank/navbar"></application>
+      <div class="container">
+        <application name="@bytebank/menu"></application>
+        <div class="aside">
+          <application name="@bytebank/account"></application>
+          <application name="@bytebank/transaction"></application>
+        </div>
+        <div>
+          <application name="@bytebank/statement"></application>
+        </div>
+      </div>
+    </route>
+  </main>
+</single-spa-router>

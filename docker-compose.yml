@@ -1,0 +1,10 @@
+services:
+  bytebank-app:
+    build:
+      context: .
+      args:
+        BUILD_PROFILE: container-local
+    ports:
+      - "8080:80"
+    environment:
+      NODE_ENV: production
