@@ -18,7 +18,16 @@ export default defineConfig([
     extends: compat.extends("important-stuff", "plugin:prettier/recommended"),
     languageOptions: {
       parser: babelParser,
+      parserOptions: {
+        requireConfigFile: true,
+      },
     },
     ignores: ["dist/**", "node_modules/**"],
+  },
+  {
+    files: ["**/*.ts"],
+    rules: {
+      "no-undef": "off",
+    },
   },
 ]);

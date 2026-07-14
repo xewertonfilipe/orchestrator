@@ -2,8 +2,26 @@ const { merge } = require("webpack-merge");
 const singleSpaDefaults = require("webpack-config-single-spa");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 
+/**
+ * @typedef {{ isLocal?: boolean; isContainerLocal?: boolean }} WebpackEnv
+ */
+
+/**
+ * @param {WebpackEnv | undefined} webpackConfigEnv
+ */
+const getTemplateParameters = (webpackConfigEnv) => {
+  return {
+    isLocal: Boolean(webpackConfigEnv && webpackConfigEnv.isLocal),
+    isContainerLocal: Boolean(
+      webpackConfigEnv && webpackConfigEnv.isContainerLocal
+    ),
+    orgName: "bytebank",
+  };
+};
+
 module.exports = (webpackConfigEnv, argv) => {
-  const orgName = "bytebank";
+  const templateParameters = getTemplateParameters(webpackConfigEnv);
+  const orgName = templateParameters.orgName;
   const defaultConfig = singleSpaDefaults({
     orgName,
     projectName: "root-config",
@@ -13,17 +31,15 @@ module.exports = (webpackConfigEnv, argv) => {
   });
 
   return merge(defaultConfig, {
+    resolve: {
+      extensions: [".ts", ".js", ".mjs", ".json"],
+    },
     // modify the webpack config however you'd like to by adding to this object
     plugins: [
       new HtmlWebpackPlugin({
         inject: false,
         template: "src/index.ejs",
-        templateParameters: {
-          isLocal: webpackConfigEnv && webpackConfigEnv.isLocal,
-          isContainerLocal:
-            webpackConfigEnv && webpackConfigEnv.isContainerLocal,
-          orgName,
-        },
+        templateParameters,
       }),
     ],
   });
