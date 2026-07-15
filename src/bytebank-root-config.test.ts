@@ -124,7 +124,7 @@ describe("bytebank-root-config", () => {
 
     expect(container?.textContent).toContain("Conta indisponivel");
     expect(container?.textContent).toContain(
-      "Nao foi possivel carregar este modulo agora"
+      "Nao foi possivel carregar este MFE agora"
     );
     expect(container?.textContent).toContain("Tentar novamente");
   });

@@ -6,12 +6,14 @@
     <route path="/home" exact>
       <application name="@bytebank/navbar"></application>
       <div class="container">
-        <application name="@bytebank/menu"></application>
+        <div class="menu-slot">
+          <application name="@bytebank/menu"></application>
+        </div>
         <div class="aside">
           <application name="@bytebank/account"></application>
           <application name="@bytebank/transaction"></application>
         </div>
-        <div>
+        <div class="statement-slot">
           <application name="@bytebank/statement"></application>
         </div>
       </div>

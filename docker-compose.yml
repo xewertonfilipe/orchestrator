@@ -1,9 +1,6 @@
 services:
   bytebank-app:
-    build:
-      context: .
-      args:
-        BUILD_PROFILE: container-local
+    build: .
     ports:
       - "8080:80"
     environment:

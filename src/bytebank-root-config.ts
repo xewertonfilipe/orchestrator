@@ -73,7 +73,7 @@ const buildFallbackMarkup = (appName: string): string => {
   return (
     `<div class="${FALLBACK_CLASS}" role="alert">` +
     `<strong>${appLabel} indisponivel.</strong>` +
-    `<span>Nao foi possivel carregar este modulo agora.</span>` +
+    `<span>Nao foi possivel carregar este MFE agora.</span>` +
     `<button type="button" class="${FALLBACK_RETRY_BUTTON_CLASS}">Tentar novamente</button>` +
     `<span class="${FALLBACK_RETRY_STATUS_CLASS}" aria-live="polite"></span>` +
     `</div>`

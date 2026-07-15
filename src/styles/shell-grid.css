@@ -9,17 +9,53 @@ body {
 }
 
 .container {
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(180px, 1fr) minmax(420px, 2.6fr) minmax(
+      220px,
+      1.2fr
+    );
+  grid-template-areas: "menu aside statement";
+  align-items: start;
   gap: 24px;
-  width: 1200px;
+  width: min(100%, 1200px);
   margin: 24px auto;
+  padding: 0 16px;
 }
 
 .aside {
-  flex-grow: 1;
+  grid-area: aside;
   display: flex;
   flex-direction: column;
   gap: 34px;
+}
+
+.menu-slot {
+  grid-area: menu;
+}
+
+.statement-slot {
+  grid-area: statement;
+}
+
+.menu-slot,
+.aside,
+.statement-slot {
+  width: 100%;
+}
+
+@media (max-width: 1024px) {
+  .container {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "menu"
+      "aside"
+      "statement";
+    gap: 20px;
+  }
+
+  .aside {
+    gap: 20px;
+  }
 }
 
 .mfe-error-fallback {

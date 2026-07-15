@@ -2,7 +2,8 @@
   "name": "@bytebank/root-config",
   "scripts": {
     "start": "webpack serve --port 9000 --env isLocal",
-    "start:container": "webpack serve --port 8080 --env isContainerLocal",
+    "start:docker": "docker compose up --build",
+    "stop:docker": "docker compose down",
     "lint": "eslint src --ext js,ts",
     "test": "cross-env BABEL_ENV=test jest --passWithNoTests",
     "format": "prettier --write .",
@@ -10,7 +11,6 @@
     "prepare": "husky install",
     "build": "concurrently npm:build:*",
     "build:webpack": "webpack --mode=production",
-    "build:container": "webpack --mode=production --env isContainerLocal",
     "typecheck": "tsc -p tsconfig.app.json"
   },
   "dependencies": {

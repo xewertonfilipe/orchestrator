@@ -25,12 +25,11 @@ npm install
 
 O orchestrator possui dois perfis para montar o import map:
 
-1. `isLocal` (portas 900x): usado quando MFEs estao rodando com `npm start`
-2. `isContainerLocal` (portas 808x): usado quando MFEs estao rodando via Docker
+1. `isLocal` (portas 9000): usado quando MFEs estao rodando com `npm start`
 
-## Executando em desenvolvimento (npm local 900x)
+## Executando em desenvolvimento (npm local 9000)
 
-1. Suba os MFEs no modo npm (`npm start`) nas portas 900x.
+1. Suba os MFEs no modo npm (`npm start`) nas portas 9000.
 2. Em outra aba/terminal, inicie o orchestrator:
 
 ```bash
@@ -39,26 +38,31 @@ npm start
 
 3. Acesse `http://localhost:9000`.
 
-## Executando em desenvolvimento (container-local 808x)
+## Executando em desenvolvimento (container-local 8080)
 
-1. Suba os MFEs via Docker (`docker compose up --build`) nas portas 808x.
-2. Inicie o orchestrator no perfil container-local:
+1. Suba os MFEs via Docker (`docker compose up --build`) nas portas 8080.
 
 ```bash
-npm run start:container
+npm run start:docker
 ```
 
 3. Acesse `http://localhost:8080`.
 
 ## Executando o orchestrator via Docker
 
-Este `docker-compose.yml` ja builda o shell com `BUILD_PROFILE=container-local`.
+Este `docker-compose.yml` builda o shell com `BUILD_PROFILE=container-local`.
 
 ```bash
-docker compose up --build
+npm run start:docker
 ```
 
 A aplicacao ficara disponivel em `http://localhost:8080`.
+
+Para parar os containers:
+
+```bash
+npm run stop:docker
+```
 
 ## Matriz de portas dos MFEs
 
@@ -80,12 +84,19 @@ A aplicacao ficara disponivel em `http://localhost:8080`.
 4. Rota default: tela de autenticacao
 5. Rota `/home`: layout com navbar, menu, account, transaction e statement
 
+## Responsividade
+
+- O layout da rota `/home` usa grid-layout para composicao dos MFEs.
+- Em telas maiores, o grid principal segue o padrao: `menu` a esquerda, `account + transaction` no centro e `statement` a direita.
+- Em telas menores, o grid muda para coluna unica nesta ordem: `menu`, `account + transaction`, `statement`.
+- A rota default com `@bytebank/authentication` permanece inalterada.
+
 ## Scripts uteis
 
-- `npm start`: orchestrator em `isLocal` (porta 9000)
-- `npm run start:container`: orchestrator em `isContainerLocal` (porta 8080)
+- `npm start`: orchestrator local porta 9000
+- `npm run start:docker`: sobe orchestrator via Docker Compose com build
+- `npm run stop:docker`: derruba containers do Docker Compose
 - `npm run build`: build de producao
-- `npm run build:container`: build de producao para perfil container-local
 - `npm test`: executa testes
 - `npm run lint`: lint
 - `npm run typecheck`: verificacao de tipos
