@@ -29,9 +29,16 @@ const FALLBACK_CLASS = "mfe-error-fallback";
 const FALLBACK_RETRY_BUTTON_CLASS = "mfe-error-retry";
 const FALLBACK_RETRY_STATUS_CLASS = "mfe-error-retry-status";
 const FALLBACK_RETRY_LOADING_CLASS = "mfe-error-retry-loading";
+const RETRY_DEFAULT_LABEL = "Tentar novamente";
+const RETRY_LOADING_LABEL = "Verificando...";
+const RETRY_LOADING_MESSAGE = "Verificando disponibilidade...";
+const RETRY_UNAVAILABLE_MESSAGE = "Modulo ainda indisponivel.";
+const RETRY_AVAILABLE_MESSAGE = "Modulo disponivel. Recarregando...";
 
 type SystemJsLike = {
   resolve: (moduleName: string) => string;
+  import: (moduleName: string) => Promise<unknown>;
+  delete?: (moduleId: string) => boolean;
 };
 
 const isLoadOrMountError = (message: string): boolean => {
@@ -76,39 +83,116 @@ const buildFallbackMarkup = (appName: string): string => {
 const resolveAppUrl = (appName: string): string | null => {
   const runtimeWindow = window as Window & { System?: SystemJsLike };
 
-  if (typeof runtimeWindow.System?.resolve !== "function") {
-    return null;
+  if (typeof runtimeWindow.System?.resolve === "function") {
+    try {
+      return runtimeWindow.System.resolve(appName);
+    } catch {
+      // Fallback to import-map script resolution below.
+    }
   }
 
-  try {
-    return runtimeWindow.System.resolve(appName);
-  } catch {
-    return null;
+  const importMapScripts = Array.from(
+    document.querySelectorAll(
+      'script[type="injector-importmap"], script[type="importmap"]'
+    )
+  );
+
+  for (let index = importMapScripts.length - 1; index >= 0; index -= 1) {
+    const scriptContent = importMapScripts[index].textContent?.trim();
+
+    if (!scriptContent) {
+      continue;
+    }
+
+    try {
+      const parsed = JSON.parse(scriptContent) as {
+        imports?: Record<string, string>;
+      };
+
+      const resolvedUrl = parsed.imports?.[appName];
+
+      if (typeof resolvedUrl === "string" && resolvedUrl.length > 0) {
+        return resolvedUrl;
+      }
+    } catch {
+      // Ignore invalid maps and continue searching in previous script tags.
+    }
   }
+
+  return null;
+};
+
+const setRetryLoadingState = (
+  button: HTMLButtonElement,
+  status: HTMLElement
+): void => {
+  button.disabled = true;
+  button.classList.add(FALLBACK_RETRY_LOADING_CLASS);
+  button.setAttribute("aria-busy", "true");
+  button.textContent = RETRY_LOADING_LABEL;
+  status.textContent = RETRY_LOADING_MESSAGE;
+};
+
+const setRetryUnavailableState = (
+  button: HTMLButtonElement,
+  status: HTMLElement
+): void => {
+  status.textContent = RETRY_UNAVAILABLE_MESSAGE;
+  button.disabled = false;
+  button.classList.remove(FALLBACK_RETRY_LOADING_CLASS);
+  button.removeAttribute("aria-busy");
+  button.textContent = RETRY_DEFAULT_LABEL;
 };
 
 const probeModuleAvailability = (appName: string): Promise<boolean> => {
+  const runtimeWindow = window as Window & { System?: SystemJsLike };
+  const system = runtimeWindow.System;
+
   const resolvedUrl = resolveAppUrl(appName);
 
-  if (!resolvedUrl) {
-    return Promise.resolve(false);
+  if (resolvedUrl && typeof system?.delete === "function") {
+    try {
+      system.delete(resolvedUrl);
+    } catch {
+      // Ignore cache invalidation errors and still try a fresh import.
+    }
   }
 
-  let probeUrl: URL;
+  const tryNetworkProbe = (): Promise<boolean> => {
+    if (!resolvedUrl) {
+      return Promise.resolve(false);
+    }
 
-  try {
-    probeUrl = new URL(resolvedUrl, window.location.href);
-    probeUrl.searchParams.set("__mfe_probe", Date.now().toString());
-  } catch {
-    return Promise.resolve(false);
+    let probeUrl: URL;
+
+    try {
+      probeUrl = new URL(resolvedUrl, window.location.href);
+      probeUrl.searchParams.set("__mfe_probe", Date.now().toString());
+    } catch {
+      return Promise.resolve(false);
+    }
+
+    if (typeof fetch !== "function") {
+      return Promise.resolve(false);
+    }
+
+    return fetch(probeUrl.toString(), {
+      method: "GET",
+      mode: "no-cors",
+      cache: "no-store",
+    })
+      .then(() => true)
+      .catch(() => false);
+  };
+
+  if (typeof system?.import !== "function") {
+    return tryNetworkProbe();
   }
 
-  return fetch(probeUrl.toString(), {
-    method: "GET",
-    cache: "no-store",
-  })
-    .then((response) => response.ok)
-    .catch(() => false);
+  return system.import(appName).then(
+    () => true,
+    () => tryNetworkProbe()
+  );
 };
 
 const attachRetryHandler = (appName: string, target: HTMLElement): void => {
@@ -123,34 +207,20 @@ const attachRetryHandler = (appName: string, target: HTMLElement): void => {
   }
 
   button.addEventListener("click", () => {
-    const defaultButtonLabel = "Tentar novamente";
-
-    button.disabled = true;
-    button.classList.add(FALLBACK_RETRY_LOADING_CLASS);
-    button.setAttribute("aria-busy", "true");
-    button.textContent = "Verificando...";
-    status.textContent = "Verificando disponibilidade...";
+    setRetryLoadingState(button, status);
 
     probeModuleAvailability(appName)
       .then((isAvailable) => {
         if (!isAvailable) {
-          status.textContent = "Modulo ainda indisponivel.";
-          button.disabled = false;
-          button.classList.remove(FALLBACK_RETRY_LOADING_CLASS);
-          button.removeAttribute("aria-busy");
-          button.textContent = defaultButtonLabel;
+          setRetryUnavailableState(button, status);
           return;
         }
 
-        status.textContent = "Modulo disponivel. Recarregando...";
+        status.textContent = RETRY_AVAILABLE_MESSAGE;
         window.location.reload();
       })
       .catch(() => {
-        status.textContent = "Modulo ainda indisponivel.";
-        button.disabled = false;
-        button.classList.remove(FALLBACK_RETRY_LOADING_CLASS);
-        button.removeAttribute("aria-busy");
-        button.textContent = defaultButtonLabel;
+        setRetryUnavailableState(button, status);
       });
   });
 };

@@ -193,20 +193,117 @@ describe("bytebank-root-config", () => {
     expect(container?.querySelectorAll(".mfe-error-fallback")).toHaveLength(1);
   });
 
-  it("probes module url when retry button is clicked", async () => {
+  it("tries System.import and falls back to network probe on retry", async () => {
     document.body.innerHTML =
       '<application name="@bytebank/account"></application>';
 
+    const deleteSpy = jest.fn();
+    const importSpy = jest.fn().mockRejectedValue(new Error("unavailable"));
+    const originalFetch = globalThis.fetch;
+    const fetchSpy = jest.fn().mockRejectedValue(new Error("offline"));
+    Object.defineProperty(globalThis, "fetch", {
+      value: fetchSpy,
+      configurable: true,
+    });
+
     (
       window as Window & {
-        System?: { resolve: (moduleName: string) => string };
+        System?: {
+          resolve: (moduleName: string) => string;
+          import: (moduleName: string) => Promise<unknown>;
+          delete?: (moduleId: string) => boolean;
+        };
       }
     ).System = {
       resolve: jest.fn(() => "http://localhost:9004/bytebank-account.js"),
+      import: importSpy,
+      delete: deleteSpy,
     };
 
+    const handler = (addErrorHandler as jest.Mock).mock.calls[0][0] as (
+      error: unknown
+    ) => void;
+
+    handler({
+      appOrParcelName: "@bytebank/account",
+      message:
+        "application '@bytebank/account' died in status LOADING_SOURCE_CODE",
+    });
+
+    const button = document.querySelector(
+      ".mfe-error-retry"
+    ) as HTMLButtonElement;
+
+    button.click();
+    await Promise.resolve();
+    await Promise.resolve();
+
+    expect(deleteSpy).toHaveBeenCalledWith(
+      "http://localhost:9004/bytebank-account.js"
+    );
+    expect(importSpy).toHaveBeenCalledWith("@bytebank/account");
+    expect(fetchSpy).toHaveBeenCalledWith(
+      expect.stringContaining("http://localhost:9004/bytebank-account.js"),
+      expect.objectContaining({
+        method: "GET",
+        mode: "no-cors",
+        cache: "no-store",
+      })
+    );
+
+    Object.defineProperty(globalThis, "fetch", {
+      value: originalFetch,
+      configurable: true,
+    });
+  });
+
+  it("shows loading state while retry availability is being checked", () => {
+    document.body.innerHTML =
+      '<application name="@bytebank/account"></application>';
+
+    const pendingImport = jest.fn(() => new Promise<unknown>(() => undefined));
+
+    (
+      window as Window & {
+        System?: {
+          resolve: (moduleName: string) => string;
+          import: (moduleName: string) => Promise<unknown>;
+        };
+      }
+    ).System = {
+      resolve: jest.fn(() => "http://localhost:9004/bytebank-account.js"),
+      import: pendingImport,
+    };
+
+    const handler = (addErrorHandler as jest.Mock).mock.calls[0][0] as (
+      error: unknown
+    ) => void;
+
+    handler({
+      appOrParcelName: "@bytebank/account",
+      message:
+        "application '@bytebank/account' died in status LOADING_SOURCE_CODE",
+    });
+
+    const button = document.querySelector(
+      ".mfe-error-retry"
+    ) as HTMLButtonElement;
+
+    button.click();
+
+    expect(button.disabled).toBe(true);
+    expect(button.classList.contains("mfe-error-retry-loading")).toBe(true);
+    expect(button.textContent).toBe("Verificando...");
+    expect(pendingImport).toHaveBeenCalledWith("@bytebank/account");
+  });
+
+  it("probes using URL from import map when System is unavailable", async () => {
+    document.body.innerHTML =
+      '<application name="@bytebank/account"></application>' +
+      '<script type="injector-importmap">{"imports":{"@bytebank/account":"http://localhost:9004/bytebank-account.js"}}</script>';
+
     const originalFetch = globalThis.fetch;
-    const fetchSpy = jest.fn().mockResolvedValue({ ok: false } as Response);
+    const fetchSpy = jest.fn().mockRejectedValue(new Error("offline"));
     Object.defineProperty(globalThis, "fetch", {
       value: fetchSpy,
       configurable: true,
@@ -232,53 +329,12 @@ describe("bytebank-root-config", () => {
 
     expect(fetchSpy).toHaveBeenCalledWith(
       expect.stringContaining("http://localhost:9004/bytebank-account.js"),
-      expect.objectContaining({ cache: "no-store", method: "GET" })
+      expect.objectContaining({
+        method: "GET",
+        mode: "no-cors",
+        cache: "no-store",
+      })
     );
-
-    Object.defineProperty(globalThis, "fetch", {
-      value: originalFetch,
-      configurable: true,
-    });
-  });
-
-  it("shows loading state while retry availability is being checked", () => {
-    document.body.innerHTML =
-      '<application name="@bytebank/account"></application>';
-
-    (
-      window as Window & {
-        System?: { resolve: (moduleName: string) => string };
-      }
-    ).System = {
-      resolve: jest.fn(() => "http://localhost:9004/bytebank-account.js"),
-    };
-
-    const originalFetch = globalThis.fetch;
-    const pendingFetch = jest.fn(() => new Promise<Response>(() => undefined));
-    Object.defineProperty(globalThis, "fetch", {
-      value: pendingFetch,
-      configurable: true,
-    });
-
-    const handler = (addErrorHandler as jest.Mock).mock.calls[0][0] as (
-      error: unknown
-    ) => void;
-
-    handler({
-      appOrParcelName: "@bytebank/account",
-      message:
-        "application '@bytebank/account' died in status LOADING_SOURCE_CODE",
-    });
-
-    const button = document.querySelector(
-      ".mfe-error-retry"
-    ) as HTMLButtonElement;
-
-    button.click();
-
-    expect(button.disabled).toBe(true);
-    expect(button.classList.contains("mfe-error-retry-loading")).toBe(true);
-    expect(button.textContent).toBe("Verificando...");
 
     Object.defineProperty(globalThis, "fetch", {
       value: originalFetch,
