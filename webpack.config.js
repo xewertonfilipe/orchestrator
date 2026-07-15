@@ -34,6 +34,15 @@ module.exports = (webpackConfigEnv, argv) => {
     resolve: {
       extensions: [".ts", ".js", ".mjs", ".json"],
     },
+    devServer: {
+      client: {
+        overlay: {
+          errors: true,
+          warnings: false,
+          runtimeErrors: false,
+        },
+      },
+    },
     // modify the webpack config however you'd like to by adding to this object
     plugins: [
       new HtmlWebpackPlugin({

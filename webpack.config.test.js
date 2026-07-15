@@ -44,6 +44,17 @@ describe("webpack config", () => {
     expect(result).toEqual(
       expect.objectContaining({
         base: { defaultConfig: true },
+        extra: expect.objectContaining({
+          devServer: {
+            client: {
+              overlay: {
+                errors: true,
+                warnings: false,
+                runtimeErrors: false,
+              },
+            },
+          },
+        }),
       })
     );
   });

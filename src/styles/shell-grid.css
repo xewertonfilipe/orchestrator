@@ -21,3 +21,70 @@ body {
   flex-direction: column;
   gap: 34px;
 }
+
+.mfe-error-fallback {
+  width: 100%;
+  border: 1px solid #b84a4a;
+  background: #fff5f5;
+  border-radius: 12px;
+  padding: 16px;
+  color: #7a2020;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.mfe-error-fallback strong {
+  font-size: 16px;
+}
+
+.mfe-error-fallback span {
+  font-size: 14px;
+}
+
+.mfe-error-retry {
+  margin-top: 8px;
+  border: 1px solid #7a2020;
+  background-color: #ffffff;
+  color: #7a2020;
+  border-radius: 8px;
+  padding: 8px 12px;
+  width: fit-content;
+  cursor: pointer;
+}
+
+.mfe-error-retry:hover {
+  background-color: #ffeaea;
+}
+
+.mfe-error-retry:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.mfe-error-retry.mfe-error-retry-loading {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.mfe-error-retry.mfe-error-retry-loading::after {
+  content: "";
+  width: 12px;
+  height: 12px;
+  border: 2px solid #7a2020;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: mfe-retry-spin 0.7s linear infinite;
+}
+
+.mfe-error-retry-status {
+  min-height: 20px;
+  font-size: 13px;
+}
+
+@keyframes mfe-retry-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
