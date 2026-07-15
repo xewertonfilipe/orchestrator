@@ -21,6 +21,24 @@ Aplicacao shell do ecossistema Bytebank, responsavel por registrar, carregar e c
 npm install
 ```
 
+## Repositorios necessarios para ambiente completo
+
+Para executar o ambiente completo com Docker, baixe todos os MFEs abaixo no mesmo nivel de pasta do orchestrator:
+
+- Orchestrator: https://github.com/xewertonfilipe/orchestrator
+- Account: https://github.com/xewertonfilipe/account
+- Menu: https://github.com/xewertonfilipe/menu
+- Navbar: https://github.com/xewertonfilipe/navbar
+- Authentication: https://github.com/xewertonfilipe/authentication
+- Statement: https://github.com/xewertonfilipe/statement
+- Transaction: https://github.com/xewertonfilipe/transaction
+
+Com o Docker Desktop aberto, voce pode subir toda a stack (orchestrator + MFEs) com:
+
+```bash
+npm run start:docker:all
+```
+
 ## Perfis de execucao em desenvolvimento
 
 O orchestrator possui dois perfis para montar o import map:
