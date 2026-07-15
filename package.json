@@ -2,8 +2,10 @@
   "name": "@bytebank/root-config",
   "scripts": {
     "start": "webpack serve --port 9000 --env isLocal",
-    "start:docker": "docker compose up --build",
-    "stop:docker": "docker compose down",
+    "start:docker": "docker compose -f docker-compose.yml up --build",
+    "start:docker:all": "docker compose -f docker-compose.yml up --build",
+    "start:docker:orchestrator": "docker compose -f docker-compose.yml up --build bytebank-app",
+    "stop:docker": "docker compose -f docker-compose.yml down",
     "lint": "eslint src --ext js,ts",
     "test": "cross-env BABEL_ENV=test jest --passWithNoTests",
     "format": "prettier --write .",

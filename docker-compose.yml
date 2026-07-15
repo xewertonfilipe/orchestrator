@@ -1,4 +1,52 @@
 services:
+  bytebank-navbar:
+    build:
+      context: ../navbar
+    ports:
+      - "8081:80"
+    environment:
+      NODE_ENV: production
+
+  bytebank-menu:
+    build:
+      context: ../menu
+    ports:
+      - "8082:80"
+    environment:
+      NODE_ENV: production
+
+  bytebank-account:
+    build:
+      context: ../account
+    ports:
+      - "8083:80"
+    environment:
+      NODE_ENV: production
+
+  bytebank-statement:
+    build:
+      context: ../statement
+    ports:
+      - "8084:80"
+    environment:
+      NODE_ENV: production
+
+  bytebank-transaction:
+    build:
+      context: ../transaction
+    ports:
+      - "8085:80"
+    environment:
+      NODE_ENV: production
+
+  bytebank-authentication:
+    build:
+      context: ../authentication
+    ports:
+      - "8087:80"
+    environment:
+      NODE_ENV: production
+
   bytebank-app:
     build:
       context: .
@@ -8,3 +56,10 @@ services:
       - "8080:80"
     environment:
       NODE_ENV: production
+    depends_on:
+      - bytebank-navbar
+      - bytebank-menu
+      - bytebank-account
+      - bytebank-statement
+      - bytebank-transaction
+      - bytebank-authentication

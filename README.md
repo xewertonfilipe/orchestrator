@@ -40,11 +40,10 @@ npm start
 
 ## Executando em desenvolvimento (container-local 8080)
 
-Use o compose unificado na raiz `frontend` para subir shell + MFEs em um comando.
+Use o compose unificado no proprio orchestrator para subir shell + MFEs em um comando.
 
 ```bash
-cd ..
-docker compose up --build
+npm run start:docker
 ```
 
 Acesse `http://localhost:8080`.
@@ -52,20 +51,20 @@ Acesse `http://localhost:8080`.
 Para parar:
 
 ```bash
-docker compose down
+npm run stop:docker
 ```
 
 ## Executando o orchestrator via Docker
 
-Este `docker-compose.yml` builda o shell com `BUILD_PROFILE=container-local`.
+Para subir somente o shell (bytebank-app) sem os demais MFEs:
 
 ```bash
-npm run start:docker
+npm run start:docker:orchestrator
 ```
 
 A aplicacao ficara disponivel em `http://localhost:8080`.
 
-Para parar os containers:
+Para parar os containers (stack completa ou shell isolado):
 
 ```bash
 npm run stop:docker
@@ -101,7 +100,9 @@ npm run stop:docker
 ## Scripts uteis
 
 - `npm start`: orchestrator local porta 9000
-- `npm run start:docker`: sobe orchestrator via Docker Compose com build
+- `npm run start:docker`: sobe stack completa via Docker Compose com build
+- `npm run start:docker:all`: alias para subir stack completa
+- `npm run start:docker:orchestrator`: sobe apenas o servico `bytebank-app`
 - `npm run stop:docker`: derruba containers do Docker Compose
 - `npm run build`: build de producao
 - `npm test`: executa testes
