@@ -59,7 +59,6 @@ body {
 }
 
 .mfe-error-fallback {
-  width: 100%;
   border: 1px solid #b84a4a;
   background: #fff5f5;
   border-radius: 12px;
@@ -68,6 +67,7 @@ body {
   display: flex;
   flex-direction: column;
   gap: 6px;
+  margin: 14px;
 }
 
 .mfe-error-fallback strong {
