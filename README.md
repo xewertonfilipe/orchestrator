@@ -108,9 +108,3 @@ npm run stop:docker
 - `npm run lint`: lint
 - `npm run typecheck`: verificacao de tipos
 - `npm run format`: formatacao com Prettier
-
-## Troubleshooting
-
-1. Se o navegador abrir o shell, mas sem MFEs, confirme se as URLs do import map estao ativas e no mesmo perfil de portas.
-2. Se um MFE especifico falhar no carregamento, acesse diretamente o arquivo `bytebank-*.js` no host/porta esperado.
-3. Se houver CORS ou erro de rede, verifique se todos os servicos estao rodando em localhost e sem conflito de portas.
