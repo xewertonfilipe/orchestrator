@@ -40,13 +40,20 @@ npm start
 
 ## Executando em desenvolvimento (container-local 8080)
 
-1. Suba os MFEs via Docker (`docker compose up --build`) nas portas 8080.
+Use o compose unificado na raiz `frontend` para subir shell + MFEs em um comando.
 
 ```bash
-npm run start:docker
+cd ..
+docker compose up --build
 ```
 
-3. Acesse `http://localhost:8080`.
+Acesse `http://localhost:8080`.
+
+Para parar:
+
+```bash
+docker compose down
+```
 
 ## Executando o orchestrator via Docker
 

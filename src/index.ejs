@@ -44,6 +44,22 @@
     </script>
   <% } %>
 
+  <% if (isContainerLocal) { %>
+    <script type="injector-importmap">
+      {
+        "imports": {
+          "@bytebank/account": "http://localhost:8083/bytebank-account.js",
+          "@bytebank/authentication": "http://localhost:8087/bytebank-authentication.js",
+          "@bytebank/menu": "http://localhost:8082/bytebank-menu.js",
+          "@bytebank/navbar": "http://localhost:8081/bytebank-navbar.js",
+          "@bytebank/root-config": "//localhost:8080/bytebank-root-config.js",
+          "@bytebank/statement": "http://localhost:8084/bytebank-statement.js",
+          "@bytebank/transaction": "http://localhost:8085/bytebank-transaction.js"
+        }
+      }
+    </script>
+  <% } %>
+
   <script src="https://cdn.jsdelivr.net/npm/import-map-overrides@5.1.1/dist/import-map-overrides.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@single-spa/import-map-injector@2.0.1/lib/import-map-injector.js"></script>
 </head>
