@@ -11,9 +11,10 @@
     "format": "prettier --write .",
     "check-format": "prettier --check .",
     "prepare": "husky install",
-    "build": "concurrently npm:build:*",
+    "build": "concurrently npm:build:webpack npm:build:container",
     "build:webpack": "webpack --mode=production",
     "build:container": "webpack --mode=production --env isContainerLocal",
+    "build:vercel": "webpack --mode=production --env isProduction",
     "typecheck": "tsc -p tsconfig.app.json"
   },
   "dependencies": {

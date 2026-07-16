@@ -46,6 +46,27 @@ Acesse `http://localhost:8080`
 O orchestrator possui dois perfis para montar o import map:
 
 1. `isLocal` (portas 9000): usado quando MFEs estao rodando com `npm start`
+2. `isContainerLocal` (portas 8080): usado quando shell + MFEs estao rodando via Docker Compose
+3. `isProduction`: usado no deploy do Vercel, com URLs publicas dos MFEs via variaveis de ambiente
+
+## Deploy no Vercel (producao)
+
+No projeto do orchestrator no Vercel, use:
+
+- Build Command: `npm run build:vercel`
+- Output Directory: `dist`
+
+Defina as variaveis de ambiente abaixo em Development/Preview/Production:
+
+- `BYTEBANK_ACCOUNT_MFE_URL`
+- `BYTEBANK_AUTHENTICATION_MFE_URL`
+- `BYTEBANK_MENU_MFE_URL`
+- `BYTEBANK_NAVBAR_MFE_URL`
+- `BYTEBANK_ROOT_CONFIG_MFE_URL`
+- `BYTEBANK_STATEMENT_MFE_URL`
+- `BYTEBANK_TRANSACTION_MFE_URL`
+
+Cada variavel deve apontar para o bundle final de cada app (exemplo: `https://<app>.vercel.app/bytebank-<app>.js`).
 
 ## Executando em desenvolvimento (npm local 9000)
 
@@ -125,6 +146,7 @@ npm run stop:docker
 - `npm run start:docker:orchestrator`: sobe apenas o servico `bytebank-app`
 - `npm run stop:docker`: derruba containers do Docker Compose
 - `npm run build`: build de producao
+- `npm run build:vercel`: build de producao com import map remoto (Vercel)
 - `npm test`: executa testes
 - `npm run lint`: lint
 - `npm run typecheck`: verificacao de tipos

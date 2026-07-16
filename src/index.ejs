@@ -60,6 +60,22 @@
     </script>
   <% } %>
 
+  <% if (isProduction) { %>
+    <script type="injector-importmap">
+      {
+        "imports": {
+          "@bytebank/account": "<%= productionImports.account %>",
+          "@bytebank/authentication": "<%= productionImports.authentication %>",
+          "@bytebank/menu": "<%= productionImports.menu %>",
+          "@bytebank/navbar": "<%= productionImports.navbar %>",
+          "@bytebank/root-config": "<%= productionImports.rootConfig %>",
+          "@bytebank/statement": "<%= productionImports.statement %>",
+          "@bytebank/transaction": "<%= productionImports.transaction %>"
+        }
+      }
+    </script>
+  <% } %>
+
   <script src="https://cdn.jsdelivr.net/npm/import-map-overrides@5.1.1/dist/import-map-overrides.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@single-spa/import-map-injector@2.0.1/lib/import-map-injector.js"></script>
 </head>

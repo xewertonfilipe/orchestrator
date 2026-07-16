@@ -10,6 +10,7 @@ jest.mock("html-webpack-plugin", () => mockHtmlWebpackPlugin);
 
 describe("webpack config", () => {
   beforeEach(() => {
+    jest.resetModules();
     jest.clearAllMocks();
   });
 
@@ -32,11 +33,13 @@ describe("webpack config", () => {
       expect.objectContaining({
         inject: false,
         template: "src/index.ejs",
-        templateParameters: {
+        templateParameters: expect.objectContaining({
           isLocal: true,
           isContainerLocal: false,
+          isProduction: false,
           orgName: "bytebank",
-        },
+          productionImports: {},
+        }),
       })
     );
 
@@ -66,11 +69,56 @@ describe("webpack config", () => {
 
     expect(mockHtmlWebpackPlugin).toHaveBeenCalledWith(
       expect.objectContaining({
-        templateParameters: {
+        templateParameters: expect.objectContaining({
           isLocal: false,
           isContainerLocal: true,
+          isProduction: false,
           orgName: "bytebank",
-        },
+          productionImports: {},
+        }),
+      })
+    );
+  });
+
+  it("builds config for production environment with remote import map", () => {
+    process.env.BYTEBANK_ACCOUNT_MFE_URL =
+      "https://account.vercel.app/bytebank-account.js";
+    process.env.BYTEBANK_AUTHENTICATION_MFE_URL =
+      "https://authentication.vercel.app/bytebank-authentication.js";
+    process.env.BYTEBANK_MENU_MFE_URL =
+      "https://menu.vercel.app/bytebank-menu.js";
+    process.env.BYTEBANK_NAVBAR_MFE_URL =
+      "https://navbar.vercel.app/bytebank-navbar.js";
+    process.env.BYTEBANK_ROOT_CONFIG_MFE_URL =
+      "https://orchestrator.vercel.app/bytebank-root-config.js";
+    process.env.BYTEBANK_STATEMENT_MFE_URL =
+      "https://statement.vercel.app/bytebank-statement.js";
+    process.env.BYTEBANK_TRANSACTION_MFE_URL =
+      "https://transaction.vercel.app/bytebank-transaction.js";
+
+    const createConfig = require("./webpack.config");
+
+    createConfig({ isProduction: true }, { mode: "production" });
+
+    expect(mockHtmlWebpackPlugin).toHaveBeenCalledWith(
+      expect.objectContaining({
+        templateParameters: expect.objectContaining({
+          isLocal: false,
+          isContainerLocal: false,
+          isProduction: true,
+          productionImports: {
+            account: "https://account.vercel.app/bytebank-account.js",
+            authentication:
+              "https://authentication.vercel.app/bytebank-authentication.js",
+            menu: "https://menu.vercel.app/bytebank-menu.js",
+            navbar: "https://navbar.vercel.app/bytebank-navbar.js",
+            rootConfig:
+              "https://orchestrator.vercel.app/bytebank-root-config.js",
+            statement: "https://statement.vercel.app/bytebank-statement.js",
+            transaction:
+              "https://transaction.vercel.app/bytebank-transaction.js",
+          },
+        }),
       })
     );
   });
