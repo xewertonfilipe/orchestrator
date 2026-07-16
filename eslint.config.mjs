@@ -22,7 +22,7 @@ export default defineConfig([
         requireConfigFile: true,
       },
     },
-    ignores: ["dist/**", "node_modules/**"],
+    ignores: ["dist/**", "node_modules/**", "**/coverage/**"],
   },
   {
     files: ["**/*.ts"],
