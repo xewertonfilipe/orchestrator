@@ -39,6 +39,8 @@ Com o Docker Desktop aberto, voce pode subir toda a stack (orchestrator + MFEs) 
 npm run start:docker:all
 ```
 
+Acesse `http://localhost:8080`
+
 ## Perfis de execucao em desenvolvimento
 
 O orchestrator possui dois perfis para montar o import map:
