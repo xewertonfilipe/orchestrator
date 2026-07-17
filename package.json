@@ -8,6 +8,8 @@
     "stop:docker": "docker compose -f docker-compose.yml down",
     "lint": "eslint src --ext js,ts",
     "test": "cross-env BABEL_ENV=test jest --passWithNoTests",
+    "test:ci": "cross-env BABEL_ENV=test jest --ci --passWithNoTests",
+    "precommit:verify": "npm run lint && npm run test:ci",
     "format": "prettier --write .",
     "check-format": "prettier --check .",
     "prepare": "husky install",
