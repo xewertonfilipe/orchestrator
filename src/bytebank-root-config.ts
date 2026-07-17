@@ -32,8 +32,8 @@ const FALLBACK_RETRY_LOADING_CLASS = "mfe-error-retry-loading";
 const RETRY_DEFAULT_LABEL = "Tentar novamente";
 const RETRY_LOADING_LABEL = "Verificando...";
 const RETRY_LOADING_MESSAGE = "Verificando disponibilidade...";
-const RETRY_UNAVAILABLE_MESSAGE = "Modulo ainda indisponivel.";
-const RETRY_AVAILABLE_MESSAGE = "Modulo disponivel. Recarregando...";
+const RETRY_UNAVAILABLE_MESSAGE = "MFE ainda indisponivel.";
+const RETRY_AVAILABLE_MESSAGE = "MFE disponivel. Recarregando...";
 
 type SystemJsLike = {
   resolve: (moduleName: string) => string;
@@ -68,7 +68,7 @@ const getAppContainer = (appName: string): HTMLElement | null => {
 };
 
 const buildFallbackMarkup = (appName: string): string => {
-  const appLabel = APP_LABELS[appName] ?? "Modulo";
+  const appLabel = APP_LABELS[appName] ?? "MFE";
 
   return (
     `<div class="${FALLBACK_CLASS}" role="alert">` +
